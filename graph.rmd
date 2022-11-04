@@ -1,0 +1,133 @@
+---
+title: "grapg.md"
+author: "Seraj"
+date: "3/28/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r,echo=FALSE, warning=F, message=FALSE}
+df <- read.csv('dec19_01-31_000000-235959.csv')
+```
+
+```{r,echo=FALSE, warning=F, message=FALSE}
+df_3days <- df[df$rt_created_at >= "2019-12-01 00:00:01" & df$rt_created_at <="2019-12-03 23:59:59",]
+df_n <- subset(df_3days, select=c(rt_author_id, t_author_id))
+df_n$rt_author_id <- as.numeric(df_n$rt_author_id)
+df_n$t_author_id <- as.numeric(df_n$t_author_id)
+df_n <- na.omit(df_n)
+```
+
+
+```{r,echo=FALSE, warning=F, message=FALSE, fig.height=10, fig.width=10}
+library(igraph)
+g <- graph.data.frame(df_n, directed=FALSE)
+#plot(g, edge.width=E(g)$weight,vertex.label=NA, vertex.size=2, vertex.color='red',edge.color='green')
+
+plot(g, vertex.label=NA, vertex.size=1, 
+     vertex.color='red',edge.color='grey', 
+     edge.size=.5, edge.arrow.size=0.1, 
+     vertex.label.cex=0.5,
+     layout=layout_as_tree)
+
+plot(g, vertex.label=NA, vertex.size=1, 
+     vertex.color='red',edge.color='grey', 
+     edge.size=.5, edge.arrow.size=0.1, 
+     vertex.label.cex=0.5,
+     layout=layout.fruchterman.reingold.grid)
+
+plot(g, vertex.label=NA, vertex.size=1, 
+     vertex.color='red',edge.color='grey', 
+     edge.size=.5, edge.arrow.size=0.1, 
+     vertex.label.cex=0.5,
+     layout=layout.circle)
+
+plot(g, vertex.label=NA, vertex.size=1, 
+     vertex.color='red',edge.color='grey', 
+     edge.size=.5, edge.arrow.size=0.1, 
+     vertex.label.cex=0.5,
+     layout=layout.davidson.harel)
+
+plot(g, vertex.label=NA, vertex.size=1, 
+     vertex.color='red',edge.color='grey', 
+     edge.size=.5, edge.arrow.size=0.1, 
+     vertex.label.cex=0.5,
+     layout=layout.graphopt)
+
+plot(g, vertex.label=NA, vertex.size=1, 
+     vertex.color='red',edge.color='grey', 
+     edge.size=.5, edge.arrow.size=0.1, 
+     vertex.label.cex=0.5,
+     layout=layout.drl)
+
+
+## or we can customize
+# plot(g, vertex.label=NA, vertex.size=degree(g)*0.2, edge.arrow.size=.1, layout=layout.fruchterman.reingold)
+# plot(g, vertex.label=NA, vertex.size=degree(g)*0.2, edge.arrow.size=.1, layout=layout_as_tree)
+
+```
+
+```{r,echo=FALSE, warning=F, message=FALSE}
+library(igraph)
+V(g)
+E(g)
+
+V(g)$label <- V(g)$name
+
+
+# Global clustering coefficient
+cat("Global clustering coefficient")
+transitivity(g)
+cat("\n")
+cat("Average clustering coefficient")
+# Average clustering coefficient
+transitivity(g, type = "average")
+# The same as above
+# mean(transitivity(g, type = "local"), na.rm = TRUE)
+
+cat("\n")
+# cat("Betweennes centrality")
+# betweenness(g)
+# cat("\n")
+# cat("Edge Betweennes")
+# edge_betweenness(g)
+cat("\n")
+cat("Degree of the Graph")
+degree(g)
+
+# Hist of node degree
+hist(degree(g), col = 'steelblue', main='Hist of node degree', xlab='degree of vertices')
+## many nodes with very few connections and no nodes with high connections
+
+```
+
+```{r,echo=FALSE, warning=F, message=FALSE, fig.height=10, fig.width=10}
+ggplot(fortify(df_n, arrow.gap = 0.01), aes(x, y, xend = rt_author_id, yend = t_author_id)) #+
+  #geom_edges(arrow = arrow(length = unit(0.3, "lines")), alpha = 0.5) +
+  #geom_nodes(aes(size = degree), shape = 21, fill = "gold", color = "tomato") +
+  #theme_blank()
+```
+
+
+
+
+<!-- ```{r,echo=FALSE, warning=F, message=FALSE ,fig.height=10, fig.width=10} -->
+<!-- library(igraph) -->
+<!-- #relations <- data.frame(from=c("Bob", "Cecil", "Cecil", "David", "David", "Esmeralda"), -->
+<!--  #                       to=c("Alice", "Bob", "Alice", "Alice", "Bob", "Alice"), -->
+<!--   #                      weight=c(4,5,5,2,1,1)) -->
+<!-- # Alternatively, you could read in the data from a similar CSV file as follows: -->
+<!--  relations <- read.csv("dec_uw_3d.csv") -->
+
+<!-- # Load (DIRECTED) graph from data frame -->
+<!-- g <- graph.data.frame(relations, directed=FALSE) # -->
+<!-- #g <- make_tree(relations) -->
+<!-- # Plot graph -->
+<!-- #plot(g, edge.width=E(g)$weight,vertex.label=NA, vertex.size=2, vertex.color='red',edge.color='green') -->
+<!-- plot(g, vertex.label=NA, vertex.size=1, vertex.color='red',edge.color='green', edge.size=.5) -->
+<!-- ``` -->
+
